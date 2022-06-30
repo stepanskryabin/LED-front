@@ -1,4 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import UI from '@/components/ui'
 
-createApp(App).mount('#app')
+const LED = createApp(App)
+
+UI.forEach(component => {
+    LED.component(component.name, component)
+})
+
+LED.mount('#app')
