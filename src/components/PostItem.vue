@@ -22,11 +22,6 @@ export default {
       required: true,
     }
   },
-  methods: {
-    deletePost() {
-      return null
-    }
-  },
 }
 </script>
 
