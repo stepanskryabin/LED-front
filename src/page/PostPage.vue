@@ -1,5 +1,6 @@
 <template>
     <main-input
+        v-focus
         v-model:value="searchQuery"
         type="text"
         placeholder="Поиск"></main-input>
@@ -26,7 +27,7 @@
         @remove="removePost"/>
   <div
       v-if="currentPage < pageMax"
-      ref="observer"
+      v-intersection="loadPosts"
       class="observer">
       <p>Загружаю...</p>
   </div>
@@ -105,18 +106,6 @@ export default {
   },
   mounted() {
     this.fetchPosts();
-    let options = {
-      rootMargin: '0px',
-      threshold: 1.0
-    };
-    // eslint-disable-next-line no-unused-vars
-    let callback = (entries, observer) => {
-      if (entries[0].isIntersecting) {
-        this.loadPosts()
-      }
-    }
-    let observer = new IntersectionObserver(callback, options);
-    observer.observe(this.$refs.observer)
   },
   watch: {
     'selectedSort': function (newValue) {

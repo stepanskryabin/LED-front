@@ -1,5 +1,5 @@
 <template>
-  <div class="post-list" @click="trace">
+  <div class="post-list">
     <h1>ТУТ ПОСТ ID = {{$route.params.id}}</h1>
   </div>
 </template>
