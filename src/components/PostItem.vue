@@ -4,18 +4,18 @@
     <div><strong>Название: </strong>{{ post.title }}</div>
     <div><strong>Описание: </strong>{{ post.body }}</div>
     <main-button
-      @click="$emit('remove', post)">Удалить</main-button>
+        :post="post"
+        @click="$router.push(`/post/${post.id}`)">
+      Открыть</main-button>
+    <main-button
+      @click="$emit('remove', post)">
+      Удалить</main-button>
   </div>
 </template>
 
 <script>
-import mainButton from "@/components/ui/mainButton";
-
 export default {
   name: "PostItem",
-  components: {
-    mainButton,
-  },
   props: {
     post: {
       type: Object,
