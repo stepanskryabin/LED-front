@@ -1,16 +1,16 @@
 <template>
     <main-input
         v-focus
-        v-model:value="searchQuery"
+        v-model:value="this.$store.state.searchQuery"
         type="text"
         placeholder="Поиск"></main-input>
     <div class="post-btn">
-      <main-dialog v-model:show="showDialog">
+      <main-dialog v-model:show="this.$store.state.showDialog">
         <p-form
             @create="createPost"/>
       </main-dialog>
       <main-button
-          @click="showDialog = true"
+          @click="this.$store.commit('changeShowDialog', true)"
           style="margin: 15px 0"
       >
         Создать пост
@@ -18,15 +18,15 @@
     </div>
     <div class="select">
       <main-select
-          v-model="selectedSort"
-          :options="sortOptions"
+          v-model="this.$store.state.selectedSort"
+          :options="this.$store.state.sortOptions"
       />
     </div>
     <p-list
-        :posts="posts"
+        :posts="this.$store.state.posts"
         @remove="removePost"/>
   <div
-      v-if="currentPage < pageMax"
+      v-if="this.$store.state.currentPage < this.$store.state.pageMax"
       v-intersection="loadPosts"
       class="observer">
       <p>Загружаю...</p>
@@ -45,20 +45,7 @@ export default {
   },
   data() {
     return {
-      posts_back: [],
-      posts: [],
-      query: '',
-      showDialog: false,
-      selectedSort: '',
-      searchQuery: '',
-      currentPage: 1,
-      postLimit: 10,
-      pageMax: 10,
-      sortOptions: [
-        {value: 'title', name: 'По названию'},
-        {value: 'body', name: 'По описанию'},
-        {value: 'id', name: 'По номеру'},
-      ]
+
     }
   },
   props: {
@@ -69,57 +56,35 @@ export default {
   },
   methods: {
     createPost(post) {
-      this.posts.push(post);
-      this.showDialog = false;
+      this.$store.commit('addPost', post)
+      this.$store.commit('changeShowDialog', false)
     },
     removePost(post) {
-      this.posts = this.posts.filter(p => p.id !== post.id);
-    },
-    async fetchPosts() {
-      try {
-        let response = await axios.get("https://jsonplaceholder.typicode.com/posts?_limit=10",
-            {params: {_limit: this.postLimit,
-                _page: this.currentPage
-              }});
-        this.pageMax = Math.ceil(response.headers['x-total-count'] / this.postLimit)
-        this.posts = response.data
-        this.posts_back = this.posts
-      } catch(err) {
-        alert(err)
-      }
-    },
-    async loadPosts() {
-      this.currentPage++;
-      try {
-        let response = await axios.get("https://jsonplaceholder.typicode.com/posts?_limit=10",
-            {params: {
-                _limit: this.postLimit,
-                _page: this.currentPage
-              }});
-        this.pageMax = Math.ceil(response.headers['x-total-count'] / this.postLimit)
-        this.posts = [...this.posts, ...response.data]
-        this.posts_back = this.posts
-      } catch(err) {
-        alert(err)
-      }
+      this.$store.commit('removePost', post)
     },
   },
   mounted() {
-    this.fetchPosts();
+    this.$store.;
   },
   watch: {
-    'selectedSort': function (newValue) {
-      this.posts.sort((post1, post2) => {
-        return post1[newValue].toString()?.localeCompare(post2[newValue].toString())
-      })
-    },
     'searchQuery': function (newValue) {
-      if (newValue === '') {
-        this.posts = this.posts_back
-      } else {
-        this.posts = this.posts.filter(post => post.title.includes(newValue))
-      }
-    },
+      this.$store.commit('setSearchQuery', newValue)
+      },
+    'selectedSort': function (newValue) {
+      this.$store.commit('sortedPosts', newValue)
+    }
+    // 'selectedSort': function (newValue) {
+    //   this.$store.state.posts.sort((post1, post2) => {
+    //     return post1[newValue].toString()?.localeCompare(post2[newValue].toString())
+    //   })
+    // },
+    // 'searchQuery': function (newValue) {
+    //   if (newValue === '') {
+    //     this.$store.state.posts = this.$store.state.posts_back
+    //   } else {
+    //     this.$store.state.posts = this.$store.state.posts.filter(post => post.title.includes(newValue))
+    //   }
+    // },
   },
 }
 </script>
